@@ -6,7 +6,7 @@ require_relative 'coordinate'
 class Canvas
 
   def initialize
-    InitWindow(1280, 850, "Testing painting block shapes")
+    InitWindow(1280, 850, "My Tetris Game")
     SetTargetFPS(60)
   end
 
@@ -19,11 +19,11 @@ class Canvas
     EndDrawing()
   end
 
-  def render_tile(type, cell_coords, row, column) 
+  def render_tile(type, cell_coords) 
     rgb_val = Config.get_rgb(type)  
     cell_coords.each do |c| 
-      DrawRectangle(screen_x_(column+c.column),
-                    screen_y_(row+c.row),
+      DrawRectangle(screen_x_(c.column),
+                    screen_y_(c.row),
                     Config::CELL_WIDTH,
                     Config::CELL_HEIGHT,
                     rgb_val)
@@ -35,7 +35,17 @@ class Canvas
     y = Config::BOARD_Y
 
     grid.each_with_index do |row, i|
+      DrawText(i.to_s, 
+               screen_x_(-1),
+               screen_y_(i),
+               Config::CELL_HEIGHT-4,
+               BLACK)
       row.each_with_index do |column, j|
+        DrawText(j.to_s, 
+                 screen_x_(j),
+                 screen_y_(-1),
+                 Config::CELL_HEIGHT-4,
+                 BLACK)
         DrawRectangle(screen_x_(j),
                       screen_y_(i),
                       Config::CELL_WIDTH,

@@ -18,11 +18,11 @@ class DropTimer
   end
 
   def normal_speed!
-    @speed = 1
+    @speed = 1 
   end
 
-  def double_speed!
-    @speed = 48 
+  def high_speed!
+    @speed = 100 
   end
 
   private

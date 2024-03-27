@@ -8,6 +8,7 @@ class Config
   NAVIGATE  = 0
   HARD_DROP = 1
   RESPAWN = 2
+  PAUSED = 3
 
   # ==============================
   # Player - Logical Constants 
@@ -15,6 +16,7 @@ class Config
   LEFT = 0
   RIGHT = 1
   DOWN = 2
+  ROTATE = 3
   
   # ==============================
   # Board - Logical Constants 
@@ -29,9 +31,11 @@ class Config
   B = 5
   L = 6
   R = 7
-  MAX_SHAPE = 8
+  MAX_TILE = 8
   EMPTY = 0
- 
+
+  SEQUENCE_LENGTH = 10
+
   # ==============================
   # Board Screen Positions 
   # ==============================
@@ -40,6 +44,9 @@ class Config
   CELL_WIDTH = CELL_HEIGHT = 25
   CELL_GAP = 2
 
+  # ==============================
+  # Colour wrapper 
+  # ==============================
   class Colour
     attr_accessor :name, :rgb
     def initialize(name, rgb)
@@ -48,20 +55,29 @@ class Config
     end
   end
 
+  # ==============================
+  # Colour definitions 
+  # ==============================
   Blue = Colour.new("BLU ", Color.from_u8(30, 75, 200, 255))
   Green = Colour.new("GRN ", Color.from_u8(30, 200, 34, 255))
   Red = Colour.new("RED ", Color.from_u8(200, 0, 34, 255))
   Yellow = Colour.new("YLW ", Color.from_u8(255, 200, 34, 255))
   Grey = Colour.new("GRY ", Color.from_u8(100, 100, 100, 255))
+  Cyan = Colour.new("CYN", Color.from_u8(0, 255, 255, 255))
+  Magenta = Colour.new("MAG", Color.from_u8(255, 0, 255, 255))
+  Orange = Colour.new("MAG", Color.from_u8(255, 165, 0, 255))
 
+  # ==============================
+  # Palette
+  # ==============================
   TetrisPalette = { EMPTY => Grey,
                     S => Blue, 
                     Z => Green,
                     T => Red, 
                     I => Yellow, 
-                    B => Grey,
-                    L => Blue,
-                    R => Red,
+                    B => Cyan,
+                    L => Magenta,
+                    R => Orange,
                    }
 
   def Config.get_rgb(value)
