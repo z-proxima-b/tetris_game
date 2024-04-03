@@ -9,6 +9,9 @@ class Config
   HARD_DROP = 1
   RESPAWN = 2
   PAUSED = 3
+  CALCULATE_SCORE = 4
+  FLASH_ROWS = 5
+  CLEAR_ROWS = 6
 
   # ==============================
   # Player - Logical Constants 
@@ -34,6 +37,9 @@ class Config
   MAX_TILE = 8
   EMPTY = 0
 
+  FLASH_ON = 9
+  FLASH_OFF = 10
+
   SEQUENCE_LENGTH = 10
 
   # ==============================
@@ -43,6 +49,12 @@ class Config
   BOARD_Y = 50 
   CELL_WIDTH = CELL_HEIGHT = 25
   CELL_GAP = 2
+
+  # ==============================
+  # Flashing Rows Constants 
+  # ==============================
+  FLASH_SPEED = 0.1  # seconds
+  FLASH_DURATION = 1.0 # seconds
 
   # ==============================
   # Colour wrapper 
@@ -65,8 +77,9 @@ class Config
   Grey = Colour.new("GRY ", Color.from_u8(100, 100, 100, 255))
   Cyan = Colour.new("CYN", Color.from_u8(0, 255, 255, 255))
   Magenta = Colour.new("MAG", Color.from_u8(255, 0, 255, 255))
-  Orange = Colour.new("MAG", Color.from_u8(255, 165, 0, 255))
-
+  Orange = Colour.new("ORA", Color.from_u8(255, 165, 0, 255))
+  Pink = Colour.new("PINK", SKYBLUE) 
+  Lime = Colour.new("LIME", GOLD)
   # ==============================
   # Palette
   # ==============================
@@ -78,6 +91,8 @@ class Config
                     B => Cyan,
                     L => Magenta,
                     R => Orange,
+                    FLASH_OFF => Pink,
+                    FLASH_ON => Lime 
                    }
 
   def Config.get_rgb(value)

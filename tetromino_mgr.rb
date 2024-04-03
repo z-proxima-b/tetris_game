@@ -117,7 +117,8 @@ class Tile
     make_coords_(@@tile_data[@type][1])
   end
 
-  @rote = 1
+  def destroy!
+    @filled_coords = []
   end
 
   def shift_left!

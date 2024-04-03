@@ -5,6 +5,7 @@ require_relative 'config'
 require_relative 'canvas'
 require_relative 'coordinate'
 require_relative 'drop_timer.rb'
+require_relative 'flash_timer.rb'
 require_relative 'tetromino_mgr'
 
 class Board
@@ -25,15 +26,54 @@ class Board
     puts "\n\n"
   end
 
+  def print_row(i)
+    @grid[i].each do |c|
+      p "#{c}, " 
+    end
+    puts "\n\n"
+  end
+
+  # reverse the result, because we use 
+  # this bottom to top 
+  def get_completed_rows
+    @grid.each_index.select { |i| 
+      i if row_complete?(i) }.reverse
+  end
+
+  def row_complete?(index)
+    @grid[index].all? { |c| c != Config::EMPTY }
+  end
+
+  def fill_row!(which, value) 
+    (0..Config::BOARD_WIDTH-1).each {|i|
+      @grid[which][i] = value
+    }
+  end
+
+  def clear_rows!(arr)
+    @grid.reverse.each_index { |i|
+      if arr.include?(i) then 
+        fill_row!(i, Config::EMPTY)
+        shuffle_down_(i-1, 0)
+      end
+    }
+  end
+
   private
-    
+   
   def initialize
     @grid = [] 
     @grid = (Config::BOARD_HEIGHT+4).times.collect do 
       empty_row_
     end
   end
-    
+
+  def shuffle_down_(first, last)
+    (first).downto(last) { |i|
+      @grid[i+1] = @grid[i].map(&:clone) 
+    }
+  end 
+
   def empty_row_
     [].fill(Config::EMPTY, 0, Config::BOARD_WIDTH)
   end
@@ -42,6 +82,15 @@ end
 
 class Player
   attr_accessor :row, :column, :board 
+
+  def init_flash
+    @flash = Config::FLASH_ON
+    @num_flashes = 0
+  end
+
+  def flash_complete? 
+    @num_flashes >= Config::FLASH_DURATION
+  end
 
   def respawn
     @tile = @tg.get_next
@@ -64,6 +113,10 @@ class Player
 
   def lock_tile
     @board.lock_tile!(@tile.type, @tile.filled_coords)
+  end
+
+  def destroy_tile
+    @tile.destroy!
   end
 
   def move_left
@@ -113,12 +166,46 @@ class Player
     } 
   end
 
+  def calculate_score
+    @completed_rows = @board.get_completed_rows
+  end
+
+  def scored? 
+    @completed_rows.empty? == false
+  end
+
+  def flash
+    toggle_flash_
+    colour_rows_
+    increment_flash_
+  end
+
+  def colour_rows_
+    @completed_rows.each { |i| 
+      @board.fill_row!(i, @flash)
+    }
+  end
+
+  def toggle_flash_
+    puts "toggle"
+    @flash == Config::FLASH_ON ? @flash = Config::FLASH_OFF : @flash = Config::FLASH_ON 
+  end
+
+  def increment_flash_
+    puts "#{@num_flashes}"
+    @num_flashes += Config::FLASH_SPEED
+  end
+
+  def clear_rows
+    @board.clear_rows!(@completed_rows) 
+  end
 
   private
 
   def initialize 
     @tg = TileGenerator.new
     @board = Board.new
+    @completed_rows = []
     respawn
   end
 
@@ -179,13 +266,34 @@ class Game
       if @timer.done?
         if @player.illegal_down?
           @player.lock_tile
-          set_next_state_(Config::RESPAWN)
+          @player.destroy_tile
+          set_next_state_(Config::CALCULATE_SCORE)
         else
           @player.move_down
         end
         @timer.reset
       end
+    when Config::CALCULATE_SCORE
+      if @player.scored? then
+        set_next_state_(Config::FLASH_ROWS)
+      else
+        set_next_state_(Config::RESPAWN)
+      end
+    when Config::FLASH_ROWS
+      @flash_timer.update  
+      if @flash_timer.done?
+        @player.flash
+        @flash_timer.reset
+      else 
+        if @player.flash_complete?
+          set_next_state_(Config::CLEAR_ROWS)
+        end
+      end
+    when Config::CLEAR_ROWS
+      @player.clear_rows
+      set_next_state_(Config::RESPAWN)
     end
+
   end
 
   def render
@@ -212,6 +320,7 @@ class Game
     @canvas = Canvas.new
     @player = Player.new
     @timer = DropTimer.new(1) 
+    @flash_timer = FlashTimer.new(Config::FLASH_SPEED)
   end
 
   def set_next_state_(new_state)
@@ -222,10 +331,13 @@ class Game
     case @state
     when Config::RESPAWN
       @player.respawn 
+      @player.init_flash
     when Config::NAVIGATE
       @timer.normal_speed!
     when Config::HARD_DROP
       @timer.high_speed!
+    when Config::CALCULATE_SCORE
+      @player.calculate_score
     end 
   end
 
