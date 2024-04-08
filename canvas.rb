@@ -19,14 +19,21 @@ class Canvas
     EndDrawing()
   end
 
+  def render_game_over
+     DrawRectangle(200, 200, 400, 150, RAYWHITE)
+  end
+
+
   def render_tile(type, cell_coords) 
     rgb_val = Config.get_rgb(type)  
     cell_coords.each do |c| 
-      DrawRectangle(screen_x_(c.column),
+      if c.row > -1 then 
+        DrawRectangle(screen_x_(c.column),
                     screen_y_(c.row),
                     Config::CELL_WIDTH,
                     Config::CELL_HEIGHT,
                     rgb_val)
+      end
     end
   end
 

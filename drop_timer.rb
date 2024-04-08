@@ -22,7 +22,7 @@ class DropTimer
   end
 
   def high_speed!
-    @speed = 100 
+    @speed = 300 
   end
 
   private

@@ -12,6 +12,7 @@ class Config
   CALCULATE_SCORE = 4
   FLASH_ROWS = 5
   CLEAR_ROWS = 6
+  GAME_OVER = 7
 
   # ==============================
   # Player - Logical Constants 

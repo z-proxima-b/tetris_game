@@ -16,7 +16,9 @@ class Board
   end
 
   def occupied?(row, column)
-    @grid[row][column] != Config::EMPTY
+    # ALL cells in the invisible area above the board
+    # i.e. row < 0, are empty by default
+    row >= 0 && @grid[row][column] != Config::EMPTY
   end
 
   def print
@@ -63,7 +65,7 @@ class Board
    
   def initialize
     @grid = [] 
-    @grid = (Config::BOARD_HEIGHT+4).times.collect do 
+    @grid = (Config::BOARD_HEIGHT).times.collect do 
       empty_row_
     end
   end
@@ -131,6 +133,12 @@ class Player
     @tile.shift_down!
   end
 
+  def shift_tile_out_of_collision
+    while illegal_respawn?
+      @tile.shift_up! 
+    end
+  end
+
   def rotate
     @tile.rotate!
   end
@@ -164,6 +172,12 @@ class Player
       outside_board_right_?(c.column) ||
       collision_?(c.row, c.column) 
     } 
+  end
+  
+  def illegal_respawn?
+    @tile.filled_coords.any? { |c| 
+      collision_?(c.row, c.column) 
+    }
   end
 
   def calculate_score
@@ -260,11 +274,16 @@ class Game
   def update
     case @state
     when Config::RESPAWN
-      set_next_state_(Config::NAVIGATE)
+      if @player.illegal_respawn? 
+        @player.shift_tile_out_of_collision
+        set_next_state_(Config::GAME_OVER)
+      else
+        set_next_state_(Config::NAVIGATE)
+      end
     when Config::NAVIGATE, Config::HARD_DROP
       @timer.update
       if @timer.done?
-        if @player.illegal_down?
+        if @player.illegal_down? 
           @player.lock_tile
           @player.destroy_tile
           set_next_state_(Config::CALCULATE_SCORE)
@@ -300,7 +319,12 @@ class Game
     @canvas.begin_paint
 
     @canvas.render_board(@player.board.grid)
-    @canvas.render_tile(@player.type, @player.filled_coords)
+    if @state == Config::GAME_OVER then 
+      @canvas.render_tile(@player.type, @player.filled_coords)
+      @canvas.render_game_over
+    else
+      @canvas.render_tile(@player.type, @player.filled_coords)
+    end
 
     @canvas.end_paint
   end

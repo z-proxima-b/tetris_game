@@ -136,6 +136,11 @@ class Tile
     @filled_coords.collect { |c| c.offset(1, 0) }
   end
 
+  def shift_up!
+    @row -= 1
+    @filled_coords.collect { |c| c.offset(-1, 0) }
+  end
+
   def get_rotated_coords
     temp_rotation = (@rote + 1 == 4 ? 0 : @rote + 1)
     make_coords_(@@tile_data[@type][temp_rotation], @row, @column)
