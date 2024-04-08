@@ -25,48 +25,35 @@ class Canvas
 
 
   def render_tile(type, cell_coords) 
-    rgb_val = Config.get_rgb(type)  
+    cellw = Config::CELL_WIDTH
+    cellh = Config::CELL_HEIGHT
+    cell_colour = Config.get_rgb(type)  
     cell_coords.each do |c| 
       if c.row > -1 then 
-        DrawRectangle(screen_x_(c.column),
-                    screen_y_(c.row),
-                    Config::CELL_WIDTH,
-                    Config::CELL_HEIGHT,
-                    rgb_val)
+        DrawRectangle(getx_(c.column), gety_(c.row), cellw, cellh, cell_colour)
       end
     end
   end
 
   def render_board(grid)
-    x = Config::BOARD_X
-    y = Config::BOARD_Y
+    cellw = Config::CELL_WIDTH
+    cellh = Config::CELL_HEIGHT
 
     grid.each_with_index do |row, i|
-      DrawText(i.to_s, 
-               screen_x_(-1),
-               screen_y_(i),
-               Config::CELL_HEIGHT-4,
-               BLACK)
+      DrawText(i.to_s, getx_(-1), gety_(i), cellh-4, BLACK)
       row.each_with_index do |column, j|
-        DrawText(j.to_s, 
-                 screen_x_(j),
-                 screen_y_(-1),
-                 Config::CELL_HEIGHT-4,
-                 BLACK)
-        DrawRectangle(screen_x_(j),
-                      screen_y_(i),
-                      Config::CELL_WIDTH,
-                      Config::CELL_HEIGHT,
-                      Config.get_rgb(grid[i][j]))
+        DrawText(j.to_s, getx_(j), gety_(-1), cellh-4, BLACK)
+        cell_colour = Config.get_rgb(grid[i][j])
+        DrawRectangle(getx_(j), gety_(i), cellw, cellh, cell_colour)
       end
     end
   end
 
-  def screen_x_(column)
+  def getx_(column)
     Config::BOARD_X + ((Config::CELL_WIDTH+Config::CELL_GAP) * column) 
   end
 
-  def screen_y_(row)
+  def gety_(row)
     Config::BOARD_Y + ((Config::CELL_HEIGHT+Config::CELL_GAP) * row) 
   end
 end
