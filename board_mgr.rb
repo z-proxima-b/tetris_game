@@ -38,8 +38,7 @@ class Board
   # reverse the result, because we use 
   # this bottom to top 
   def get_completed_rows
-    @grid.each_index.select { |i| 
-      i if row_complete?(i) }.reverse
+    @grid.each_index.select { |i| i if row_complete?(i) }.reverse
   end
 
   def row_complete?(index)
@@ -47,9 +46,7 @@ class Board
   end
 
   def fill_row!(which, value) 
-    (0..Config::BOARD_WIDTH-1).each {|i|
-      @grid[which][i] = value
-    }
+    (0..Config::BOARD_WIDTH-1).each {|i| @grid[which][i] = value }
   end
 
   def clear_rows!(arr)
@@ -64,16 +61,13 @@ class Board
   private
    
   def initialize
-    @grid = [] 
-    @grid = (Config::BOARD_HEIGHT).times.collect do 
-      empty_row_
-    end
+    @grid = (Config::BOARD_HEIGHT).times.collect { empty_row_ } 
   end
 
   def shuffle_down_(first, last)
-    (first).downto(last) { |i|
-      @grid[i+1] = @grid[i].map(&:clone) 
-    }
+    # working from bottom to top,
+    # copy row i to the row immediately below (i+1) 
+    (first).downto(last) { |i| @grid[i+1] = @grid[i].map(&:clone) } 
   end 
 
   def empty_row_
@@ -145,22 +139,19 @@ class Player
 
   def illegal_left?
     @tile.filled_coords.any? { |c| 
-      outside_board_left_?(c.column-1) ||
-      collision_?(c.row, c.column-1) 
+      outside_board_left_?(c.column-1) || collision_?(c.row, c.column-1) 
     }
   end
 
   def illegal_right?
     @tile.filled_coords.any? { |c| 
-      outside_board_right_?(c.column+1) || 
-      collision_?(c.row, c.column+1) 
+      outside_board_right_?(c.column+1) || collision_?(c.row, c.column+1) 
     }
   end
 
   def illegal_down?
     @tile.filled_coords.any? { |c| 
-      outside_board_below_?(c.row+1) || 
-      collision_?(c.row+1, c.column) 
+      outside_board_below_?(c.row+1) || collision_?(c.row+1, c.column) 
     }
   end
 
@@ -175,9 +166,7 @@ class Player
   end
   
   def illegal_respawn?
-    @tile.filled_coords.any? { |c| 
-      collision_?(c.row, c.column) 
-    }
+    @tile.filled_coords.any? { |c| collision_?(c.row, c.column) } 
   end
 
   def calculate_score
@@ -195,18 +184,14 @@ class Player
   end
 
   def colour_rows_
-    @completed_rows.each { |i| 
-      @board.fill_row!(i, @flash)
-    }
+    @completed_rows.each { |i| @board.fill_row!(i, @flash) }
   end
 
   def toggle_flash_
-    puts "toggle"
     @flash == Config::FLASH_ON ? @flash = Config::FLASH_OFF : @flash = Config::FLASH_ON 
   end
 
   def increment_flash_
-    puts "#{@num_flashes}"
     @num_flashes += Config::FLASH_SPEED
   end
 
