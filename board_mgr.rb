@@ -156,8 +156,8 @@ class Player
   end
 
   def illegal_rotate? 
-    check_cells = @tile.get_rotated_coords
-    check_cells.any? { |c|
+    @rotated = @tg.get_rotated(@tile)
+    @rotated.filled_coords.any? { |c|
       outside_board_below_?(c.row) ||
       outside_board_left_?(c.column) ||
       outside_board_right_?(c.column) ||

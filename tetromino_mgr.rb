@@ -103,11 +103,11 @@ class Tile
     [0, 4]
   ]
 
-  attr_accessor :type, :rotation, :filled_coords
+  attr_accessor :type, :rote, :filled_coords
 
-  def initialize(type)
+  def initialize(type, rotation=0)
     @type = type 
-    @rote = 0   # rote = 'rotation'
+    @rote = rotation  
     @row = @@start_pos_data[@type][0]
     @column = @@start_pos_data[@type][1]
     @filled_coords = make_coords_(@@tile_data[@type][@rote], @row, @column)
@@ -141,11 +141,6 @@ class Tile
     @filled_coords.collect { |c| c.offset(-1, 0) }
   end
 
-  def get_rotated_coords
-    temp_rotation = (@rote + 1 == 4 ? 0 : @rote + 1)
-    make_coords_(@@tile_data[@type][temp_rotation], @row, @column)
-  end
-
   def rotate!
     @rote + 1 == 4 ? @rote = 0 : @rote += 1
     @filled_coords = make_coords_(@@tile_data[@type][@rote],@row, @column)
@@ -154,12 +149,8 @@ class Tile
   private
 
   def make_coords_(cell_data, row_offs=0, column_offs=0)
-    cell_data.collect { |c|
-      Coordinate.new(c[0]+row_offs, c[1]+column_offs) 
-    }
+    cell_data.collect { |c| Coordinate.new(c[0]+row_offs, c[1]+column_offs) } 
   end
-
-  
 end
 
 class TileGenerator
@@ -169,6 +160,11 @@ class TileGenerator
       @tilestream_ = random_sequence_ 
     end
     Tile.new(@tilestream_.shift)
+  end
+
+  def get_rotated(tile)
+    new_rotation = (tile.rote + 1 == 4 ? 0 : tile.rote + 1)
+    Tile.new(tile.type, new_rotation) 
   end
 
   private

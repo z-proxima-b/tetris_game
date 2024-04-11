@@ -25,28 +25,39 @@ class Canvas
 
 
   def render_tile(type, cell_coords) 
-    cellw = Config::CELL_WIDTH
-    cellh = Config::CELL_HEIGHT
-    cell_colour = Config.get_rgb(type)  
     cell_coords.each do |c| 
-      if c.row > -1 then 
-        DrawRectangle(getx_(c.column), gety_(c.row), cellw, cellh, cell_colour)
-      end
+      if visible?(c.row) then draw_cell_(c.row, c.column, type) end 
     end
   end
 
   def render_board(grid)
-    cellw = Config::CELL_WIDTH
-    cellh = Config::CELL_HEIGHT
-
     grid.each_with_index do |row, i|
-      DrawText(i.to_s, getx_(-1), gety_(i), cellh-4, BLACK)
       row.each_with_index do |column, j|
-        DrawText(j.to_s, getx_(j), gety_(-1), cellh-4, BLACK)
-        cell_colour = Config.get_rgb(grid[i][j])
-        DrawRectangle(getx_(j), gety_(i), cellw, cellh, cell_colour)
+        draw_cell_(i, j, grid[i][j])
       end
     end
+
+    # number each of the rows 
+    (0..Config::BOARD_HEIGHT-1).each do |i|
+      draw_cell_digit_(i, -1, i)
+    end
+
+    # number each of the columns
+    (0..Config::BOARD_WIDTH-1).each do |j|
+      draw_cell_digit_(-1, j, j)
+    end
+  end
+
+  def draw_cell_(row, column, type)
+    w = Config::CELL_WIDTH
+    h = Config::CELL_HEIGHT
+    colour = Config.get_rgb(type)
+    DrawRectangle(getx_(column), gety_(row), w, h, colour)
+  end
+
+  def draw_cell_digit_(row, column, value)
+    h = Config::CELL_HEIGHT-4
+    DrawText(value.to_s, getx_(column), gety_(row), h-4, BLACK)
   end
 
   def getx_(column)
@@ -55,6 +66,10 @@ class Canvas
 
   def gety_(row)
     Config::BOARD_Y + ((Config::CELL_HEIGHT+Config::CELL_GAP) * row) 
+  end
+
+  def visible?(row)
+    row > -1
   end
 end
 
