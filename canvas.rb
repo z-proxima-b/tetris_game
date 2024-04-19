@@ -12,7 +12,7 @@ class Canvas
 
   def begin_paint
     BeginDrawing()
-    ClearBackground(RAYWHITE)
+    ClearBackground(DARKBROWN)
   end
 
   def end_paint
@@ -30,21 +30,13 @@ class Canvas
     end
   end
 
-  def render_board(grid)
-    grid.each_with_index do |row, i|
-      row.each_with_index do |column, j|
-        draw_cell_(i, j, grid[i][j])
-      end
-    end
-
-    # number each of the rows 
-    (0..Config::BOARD_HEIGHT-1).each do |i|
+  def render_board(rows)
+    Config.all_rows.each do |i| 
       draw_cell_digit_(i, -1, i)
-    end
-
-    # number each of the columns
-    (0..Config::BOARD_WIDTH-1).each do |j|
-      draw_cell_digit_(-1, j, j)
+      Config.all_columns.each do |j|
+        draw_cell_(i, j, rows[i][j])
+        draw_cell_digit_(-1, j, j)
+      end
     end
   end
 

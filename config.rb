@@ -51,11 +51,19 @@ class Config
   CELL_WIDTH = CELL_HEIGHT = 25
   CELL_GAP = 2
 
+  def Config.all_rows
+    (0..BOARD_HEIGHT-1)
+  end
+
+  def Config.all_columns
+    (0..BOARD_WIDTH-1)
+  end
+  
   # ==============================
   # Flashing Rows Constants 
   # ==============================
-  FLASH_SPEED = 0.1  # seconds
-  FLASH_DURATION = 1.0 # seconds
+  ONE_FLASH_DURATION = 0.1  # seconds
+  TOTAL_FLASH_DURATION = 1.0 # seconds
 
   # ==============================
   # Colour wrapper 
@@ -99,5 +107,6 @@ class Config
   def Config.get_rgb(value)
     TetrisPalette[value].rgb
   end
+
 
  end

@@ -1,8 +1,9 @@
 require 'Raylib'
 require_relative './raylib_include.rb'
-require_relative './timer.rb'
 
-class FlashTimer < Time
+# create the timer by passing in a lifetime 
+# in seconds (float) 
+class Timer
 
   def timeout?
     @lifeleft < 0
