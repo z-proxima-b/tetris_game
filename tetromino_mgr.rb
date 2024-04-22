@@ -83,6 +83,13 @@ class Tile
     ]
   ]
 
+  def make_coords_(cell_data, row_offs=0, column_offs=0)
+    cell_data.collect { |c| Coordinate.new(c[0]+row_offs, c[1]+column_offs) } 
+  end
+end
+
+class MovableTile < Tile
+
   @@start_pos_data = 
   [
     [],
@@ -104,18 +111,6 @@ class Tile
   ]
 
   attr_accessor :type, :rote, :filled_coords
-
-  def initialize(type, rotation=0)
-    @type = type 
-    @rote = rotation  
-    @row = @@start_pos_data[@type][0]
-    @column = @@start_pos_data[@type][1]
-    @filled_coords = make_coords_(@@tile_data[@type][@rote], @row, @column)
-  end
-
-  def preview 
-    make_coords_(@@tile_data[@type][1])
-  end
 
   def destroy!
     @filled_coords = []
@@ -148,8 +143,82 @@ class Tile
 
   private
 
-  def make_coords_(cell_data, row_offs=0, column_offs=0)
-    cell_data.collect { |c| Coordinate.new(c[0]+row_offs, c[1]+column_offs) } 
+  def initialize(type_value, rotation=0)
+    @type = type_value 
+    @row = @@start_pos_data[@type][0]
+    @column = @@start_pos_data[@type][1]
+    @filled_coords = make_coords_(@@tile_data[@type][rotation], @row, @column)
+    @rote = rotation
+  end
+
+end
+
+class PreviewTile < Tile
+  attr_accessor :type, :filled_coords, :width, :height
+
+  private
+
+  @@preview_data = 
+  [
+    [],
+    # Z ========================##
+    [[0,0],[0,1],[1,1],[1,2]],
+    # S ========================##
+    [[0,1], [0,2], [1,0], [1,1]],
+    # T ========================##
+    [[0,0], [0,1], [0,2], [1,1]],
+    # I ========================##
+    [[0,0], [0,1], [0,2], [0,3]],
+    # Box ======================##
+    [[0,0], [0,1], [1,0], [1,1]],
+    # L ========================##
+    [[0,0], [0,1], [0,2], [1,0]],
+    # R ========================##
+    [[0,0], [1,0], [1,1], [1,2]],
+  ]
+
+  @@width_data =
+  [
+    [],
+    # Z ========================##
+    3, 
+    # S ========================##
+    3, 
+    # T ========================##
+    3, 
+    # I ========================##
+    4, 
+    # Box ======================##
+    2, 
+    # L ========================##
+    3, 
+    # R ========================##
+    3 
+  ]
+
+  @@height_data =
+  [
+    [],
+    # Z ========================##
+    2, 
+    # S ========================##
+    2, 
+    # T ========================##
+    2, 
+    # I ========================##
+    1, 
+    # Box ======================##
+    2, 
+    # L ========================##
+    2, 
+    # R ========================##
+    2 
+  ]
+  def initialize(type_value)
+    @type = type_value 
+    @filled_coords = make_coords_(@@preview_data[@type])
+    @width = @@width_data[@type]
+    @height = @@height_data[@type]
   end
 end
 
@@ -159,12 +228,19 @@ class TileGenerator
     if @tilestream_.empty? then
       @tilestream_ = random_sequence_ 
     end
-    Tile.new(@tilestream_.shift)
+    MovableTile.new(@tilestream_.shift)
   end
 
   def get_rotated(tile)
     new_rotation = (tile.rote + 1 == 4 ? 0 : tile.rote + 1)
-    Tile.new(tile.type, new_rotation) 
+    MovableTile.new(tile.type, new_rotation) 
+  end
+
+  def get_preview
+    if @tilestream_.empty? then
+      @tilestream_ = random_sequence_
+    end
+    PreviewTile.new(@tilestream_.first) 
   end
 
   private

@@ -41,15 +41,27 @@ class Config
   FLASH_ON = 9
   FLASH_OFF = 10
 
-  SEQUENCE_LENGTH = 10
+  BOARD_EDGE = 11
 
+  SEQUENCE_LENGTH = 5
+
+  # ==============================
+  # Screen Dimensions 
+  # ==============================
+  SCREEN_WIDTH = 620
+  SCREEN_HEIGHT = 620
+  
   # ==============================
   # Board Screen Positions 
   # ==============================
-  BOARD_X = 150 
-  BOARD_Y = 50 
-  CELL_WIDTH = CELL_HEIGHT = 25
+  CELL_WIDTH = CELL_HEIGHT = 24
   CELL_GAP = 2
+  RIGHT_SPACE = 24 
+  BOARD_WIDTH_PHYSICAL = (CELL_WIDTH+CELL_GAP)*BOARD_WIDTH
+  BOARD_HEIGHT_PHYSICAL = (CELL_HEIGHT+CELL_GAP)*BOARD_HEIGHT
+  BOARD_X = (SCREEN_WIDTH - BOARD_WIDTH_PHYSICAL)/2 
+  BOARD_Y = 50 
+  BOX_X = BOARD_X + BOARD_WIDTH_PHYSICAL + RIGHT_SPACE 
 
   def Config.all_rows
     (0..BOARD_HEIGHT-1)
@@ -64,6 +76,17 @@ class Config
   # ==============================
   ONE_FLASH_DURATION = 0.1  # seconds
   TOTAL_FLASH_DURATION = 1.0 # seconds
+
+  # ==============================
+  # Preview Constants 
+  # ==============================
+  PREVIEW_CELL_WIDTH = 18 
+  PREVIEW_CELL_GAP = 1
+  PREVIEW_CELL_HEIGHT = 18 
+  PREVIEW_X = BOX_X
+  PREVIEW_Y = BOARD_Y + CELL_HEIGHT 
+  PREVIEW_BOX_WIDTH = PREVIEW_CELL_WIDTH*4 
+  PREVIEW_BOX_HEIGHT = PREVIEW_CELL_HEIGHT*4
 
   # ==============================
   # Colour wrapper 
@@ -83,12 +106,14 @@ class Config
   Green = Colour.new("GRN ", Color.from_u8(30, 200, 34, 255))
   Red = Colour.new("RED ", Color.from_u8(200, 0, 34, 255))
   Yellow = Colour.new("YLW ", Color.from_u8(255, 200, 34, 255))
-  Grey = Colour.new("GRY ", Color.from_u8(100, 100, 100, 255))
+  Grey = Colour.new("GRY ", Color.from_u8(20, 33, 61, 255))
   Cyan = Colour.new("CYN", Color.from_u8(0, 255, 255, 255))
   Magenta = Colour.new("MAG", Color.from_u8(255, 0, 255, 255))
   Orange = Colour.new("ORA", Color.from_u8(255, 165, 0, 255))
   Pink = Colour.new("PINK", SKYBLUE) 
   Lime = Colour.new("LIME", GOLD)
+  DarkBrown = Colour.new("DBR", Color.from_u8(76, 63, 47, 255))
+  PaleBlue = Colour.new("PLB", Color.from_u8(144, 224, 239, 255))
   # ==============================
   # Palette
   # ==============================
@@ -101,7 +126,8 @@ class Config
                     L => Magenta,
                     R => Orange,
                     FLASH_OFF => Pink,
-                    FLASH_ON => Lime 
+                    FLASH_ON => Lime,
+                    BOARD_EDGE => PaleBlue 
                    }
 
   def Config.get_rgb(value)

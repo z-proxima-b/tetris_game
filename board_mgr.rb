@@ -77,22 +77,15 @@ class Grid
 end
 
 class Player
-  attr_accessor :row, :column 
+  attr_accessor :tile, :preview, :row, :column 
 
   def respawn
     @tile = @tg.get_next
+    @preview = @tg.get_preview
   end
 
   def board
     @board.rows
-  end
-
-  def type
-    @tile.type
-  end
-
-  def filled_coords
-    @tile.filled_coords
   end
 
   def print_filled_cells(cells, row, column)
@@ -282,14 +275,22 @@ class Game
     @canvas.begin_paint
 
     @canvas.render_board(@player.board)
-    @canvas.render_tile(@player.type, @player.filled_coords)
+    @canvas.render_tile(@player.tile)
+    @canvas.render_preview(@player.preview)
+    @canvas.render_score(3)
+    @canvas.render_lines(3)
+
     if @state == Config::GAME_OVER then 
       @canvas.render_game_over
     end
 
     @canvas.end_paint
   end
- 
+
+  def cleanup
+    @canvas.close
+  end
+
   def transition
     if @next_state != @state then
       @state = @next_state
@@ -331,6 +332,8 @@ class Game
       @droptimer.high_speed!
     when Config::CALCULATE_SCORE
       @player.calculate_score
+    when Config::FLASH_ROWS
+      @canvas.play_sparkle
     end 
   end
 
@@ -365,7 +368,11 @@ class Game
   end
 
   def toggle_flash_colour_
-    @flash_colour == Config::FLASH_ON ? @flash_colour = Config::FLASH_OFF : @flash_colour = Config::FLASH_ON 
+    if @flash_colour == Config::FLASH_ON 
+      @flash_colour = Config::FLASH_OFF
+    else
+      @flash_colour = Config::FLASH_ON 
+    end
   end
 
   def flashing_complete_? 
@@ -385,4 +392,5 @@ if __FILE__ == $PROGRAM_NAME
     game.render
     game.transition
   end
+  game.cleanup
 end
